@@ -57,7 +57,7 @@ if ( file_exists( EAI_ML_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
  * 
  * Le plugin requiert :
  * - AI Engine Pro (Meow Apps)
- * - Polylang (WP Syntex)
+ * - Polylang ou Polylang Pro (WP Syntex)
  * - AI Engine Elevatio v2.6.0+ (recommandé mais optionnel)
  * 
  * @since 1.0.0
@@ -74,10 +74,21 @@ function eai_ml_check_dependencies() {
 		);
 	}
 	
-	// Vérifier Polylang
-	if ( ! function_exists( 'pll_current_language' ) ) {
+	// Vérifier Polylang (gratuit ou Pro)
+	// Méthode 1 : Vérifier si fonction existe (après chargement)
+	// Méthode 2 : Vérifier si constante POLYLANG_VERSION existe
+	// Méthode 3 : Vérifier si plugins sont actifs
+	$polylang_active = defined( 'POLYLANG_VERSION' ) 
+		|| function_exists( 'pll_current_language' )
+		|| class_exists( 'Polylang' )
+		|| ( function_exists( 'is_plugin_active' ) && (
+			is_plugin_active( 'polylang/polylang.php' ) 
+			|| is_plugin_active( 'polylang-pro/polylang.php' )
+		) );
+	
+	if ( ! $polylang_active ) {
 		$missing[] = array(
-			'name' => 'Polylang',
+			'name' => 'Polylang ou Polylang Pro',
 			'url'  => 'https://wordpress.org/plugins/polylang/',
 		);
 	}
