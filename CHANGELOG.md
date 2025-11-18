@@ -7,6 +7,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [1.0.1] - 2025-11-18
+
+### 🐛 Fixed (Corrections)
+
+- **Détection Polylang Pro** : Amélioration de la détection de Polylang et Polylang Pro à l'activation du plugin
+  - Vérification multiple : `POLYLANG_VERSION`, `pll_current_language()`, classe `Polylang`, et plugins actifs
+  - Support explicite de `polylang-pro/polylang.php` en plus de `polylang/polylang.php`
+  - Chargement automatique de `plugin.php` pour utiliser `is_plugin_active()`
+- **Message d'erreur** : Clarification du message d'erreur si Polylang manquant ("Polylang ou Polylang Pro")
+
+### 📝 Technical Details
+
+- Fonction `eai_ml_check_dependencies()` améliorée avec détection multi-méthodes
+- Hook `eai_ml_activate()` charge maintenant `wp-admin/includes/plugin.php` si nécessaire
+- Compatibilité assurée avec Polylang gratuit ET Polylang Pro
+
+---
+
 ## [1.0.0] - 2025-11-18
 
 ### ✨ Added (Nouvelles fonctionnalités)

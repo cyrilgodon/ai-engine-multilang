@@ -3,7 +3,7 @@
  * Plugin Name: AI Engine Multilang by Elevatio
  * Plugin URI: https://github.com/cyrilgodon/ai-engine-multilang
  * Description: Gestion multilingue complète pour AI Engine avec Polylang. Détecte les changements de langue et traduit automatiquement l'interface du chatbot (textes UI, Quick Actions). Requiert AI Engine, Polylang et AI Engine Elevatio.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Elevatio / Cyril Godon
  * Author URI: https://elevatio.fr
  * License: GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // CONSTANTES DU PLUGIN
 // ============================================================================
 
-define( 'EAI_ML_VERSION', '1.0.0' );
+define( 'EAI_ML_VERSION', '1.0.1' );
 define( 'EAI_ML_PLUGIN_FILE', __FILE__ );
 define( 'EAI_ML_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EAI_ML_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
