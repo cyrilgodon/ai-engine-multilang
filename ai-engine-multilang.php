@@ -117,6 +117,11 @@ function eai_ml_check_elevatio_compatibility() {
  * @since 1.0.0
  */
 function eai_ml_activate() {
+	// Charger plugin.php pour is_plugin_active()
+	if ( ! function_exists( 'is_plugin_active' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	
 	$missing = eai_ml_check_dependencies();
 	
 	if ( ! empty( $missing ) ) {
