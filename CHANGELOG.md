@@ -7,6 +7,33 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [1.0.3] - 2025-11-18
+
+### 🧹 Refactoring (Simplification Majeure)
+
+- **Suppression du code de vérification custom** : Tout le système de vérification manuelle des dépendances a été supprimé
+  - ❌ Supprimé `eai_ml_check_dependencies()` (150+ lignes de code inutile)
+  - ❌ Supprimé `eai_ml_check_elevatio_compatibility()`
+  - ❌ Supprimé `eai_ml_runtime_dependencies_check()` et son hook `admin_notices`
+  - ❌ Supprimé toute la logique custom de vérification à l'activation
+- **Utilisation du système natif WordPress** : Le header `Requires Plugins: ai-engine, polylang` gère TOUT automatiquement
+  - WordPress affiche le message d'erreur si dépendances manquantes
+  - WordPress empêche l'activation si plugins requis absents
+  - Aucun code PHP nécessaire pour gérer les dépendances
+- **Code simplifié** : Le plugin passe de ~250 lignes à ~100 lignes (60% de réduction)
+- **Best practices WordPress** : Utilisation exclusive des systèmes natifs WordPress
+
+### 📝 Impact
+
+**Avant v1.0.3** : 250+ lignes de code custom pour gérer les dépendances  
+**Après v1.0.3** : 1 ligne de header (`Requires Plugins:`) gère tout automatiquement
+
+### 🎯 Leçon Apprise
+
+Toujours utiliser les systèmes natifs WordPress AVANT de créer des solutions custom. Le header `Requires Plugins:` existe depuis WordPress 6.5 et rend obsolète tout code de vérification manuelle.
+
+---
+
 ## [1.0.2] - 2025-11-18
 
 ### 🐛 Fixed (Corrections Critiques)

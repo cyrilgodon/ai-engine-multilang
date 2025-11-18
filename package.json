@@ -1,6 +1,6 @@
 {
   "name": "ai-engine-multilang",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Gestion multilingue pour AI Engine avec Polylang",
   "main": "index.js",
   "scripts": {
