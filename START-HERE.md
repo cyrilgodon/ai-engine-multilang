@@ -126,7 +126,7 @@ git commit -m "feat: Initial commit - AI Engine Multilang v1.0.0"
 **C. Pusher le code :**
 
 ```bash
-git remote add origin https://github.com/cyrilgogon/ai-engine-multilang.git
+git remote add origin https://github.com/cyrilgodon/ai-engine-multilang.git
 git branch -M main
 git push -u origin main
 ```
@@ -137,7 +137,7 @@ git push -u origin main
 
 **A. Sur GitHub Web UI :**
 
-1. Va sur https://github.com/cyrilgogon/ai-engine-multilang/releases
+1. Va sur https://github.com/cyrilgodon/ai-engine-multilang/releases
 2. Clique **"Draft a new release"**
 3. **Tag version** : `1.0.0` (sans "v")
 4. **Release title** : `Version 1.0.0 - Initial Release`
@@ -277,7 +277,7 @@ Le plugin **AI Engine Multilang by Elevatio** est prêt à être déployé !
 
 ## 📞 Support
 
-- **Bugs** : Ouvrir une issue sur [GitHub](https://github.com/cyrilgogon/ai-engine-multilang/issues)
+- **Bugs** : Ouvrir une issue sur [GitHub](https://github.com/cyrilgodon/ai-engine-multilang/issues)
 - **Questions** : Consulter [README.md](README.md) ou [SPECS.md](SPECS.md)
 - **Contact** : contact@elevatio.fr
 
@@ -290,4 +290,5 @@ https://elevatio.fr
 ---
 
 **Bon courage pour les tests et le déploiement ! 💪**
+
 

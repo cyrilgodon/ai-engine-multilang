@@ -12,7 +12,7 @@ Avant d'installer AI Engine Multilang, assure-toi d'avoir :
 
 - ✅ **AI Engine Pro** (Meow Apps) : [https://ai-engine.meowapps.com/](https://ai-engine.meowapps.com/)
 - ✅ **Polylang** (gratuit ou Pro) : [https://wordpress.org/plugins/polylang/](https://wordpress.org/plugins/polylang/)
-- ✅ **AI Engine Elevatio** v2.6.0+ (recommandé) : [https://github.com/cyrilgogon/ai-engine-elevatio](https://github.com/cyrilgogon/ai-engine-elevatio)
+- ✅ **AI Engine Elevatio** v2.6.0+ (recommandé) : [https://github.com/cyrilgodon/ai-engine-elevatio](https://github.com/cyrilgodon/ai-engine-elevatio)
 
 ### 2️⃣ Installer AI Engine Multilang
 
@@ -44,7 +44,7 @@ Label: Oui, démarre (facile) [fr]|Yes, start (easy) [en]|Sí, comienza (fácil)
 **Étapes dans AI Engine :**
 
 1. Va dans **AI Engine > Chatbots > [Ton chatbot]**
-2. Section **Quick Actions** (ou installe [MWAI Quick Actions](https://github.com/cyrilgogon/mwai-quick-actions))
+2. Section **Quick Actions** (ou installe [MWAI Quick Actions](https://github.com/cyrilgodon/mwai-quick-actions))
 3. Pour chaque Quick Action, écris le label au format multilingue :
 
 ```
@@ -160,16 +160,17 @@ add_filter( 'eai_ml_popup_translations', function( $translations ) {
 
 - 📖 Lire le **[README complet](README.md)** pour toutes les fonctionnalités
 - 🐛 Consulter la **[section Dépannage](README.md#-dépannage)** si problème
-- 🚀 Rejoindre le repo GitHub : [https://github.com/cyrilgogon/ai-engine-multilang](https://github.com/cyrilgogon/ai-engine-multilang)
+- 🚀 Rejoindre le repo GitHub : [https://github.com/cyrilgodon/ai-engine-multilang](https://github.com/cyrilgodon/ai-engine-multilang)
 
 ---
 
 **Prêt à utiliser ! 🎉**
 
-Si tu as des questions, consulte la [documentation complète](README.md) ou ouvre une [issue sur GitHub](https://github.com/cyrilgogon/ai-engine-multilang/issues).
+Si tu as des questions, consulte la [documentation complète](README.md) ou ouvre une [issue sur GitHub](https://github.com/cyrilgodon/ai-engine-multilang/issues).
 
 ---
 
 **Développé par Elevatio** 🚀  
 https://elevatio.fr
+
 

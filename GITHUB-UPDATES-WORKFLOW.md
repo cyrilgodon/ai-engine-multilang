@@ -25,7 +25,7 @@ Le plugin est déjà configuré dans `ai-engine-multilang.php` :
 ```php
 if ( class_exists( 'YahnisElsts\PluginUpdateChecker\v5\PucFactory' ) ) {
     $eaiMLUpdateChecker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-        'https://github.com/cyrilgogon/ai-engine-multilang',
+        'https://github.com/cyrilgodon/ai-engine-multilang',
         __FILE__,
         'ai-engine-multilang'
     );
@@ -90,7 +90,7 @@ git push origin main
 
 **Option A : Via GitHub Web UI**
 
-1. Va sur https://github.com/cyrilgogon/ai-engine-multilang/releases
+1. Va sur https://github.com/cyrilgodon/ai-engine-multilang/releases
 2. Clique **"Draft a new release"**
 3. **Tag version** : `1.1.0` (sans "v" devant)
 4. **Release title** : `Version 1.1.0 - Description courte`
@@ -124,7 +124,7 @@ Si ton repo GitHub est **privé**, les utilisateurs doivent configurer un **toke
 
 ```php
 $eaiMLUpdateChecker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-    'https://github.com/cyrilgogon/ai-engine-multilang',
+    'https://github.com/cyrilgodon/ai-engine-multilang',
     __FILE__,
     'ai-engine-multilang'
 );
@@ -241,4 +241,5 @@ Chaque fois que tu publies une **release GitHub**, les utilisateurs reçoivent a
 
 **Développé par Elevatio**  
 https://elevatio.fr
+
 

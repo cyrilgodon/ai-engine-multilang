@@ -35,7 +35,7 @@
 - PHP 7.4+
 - **[AI Engine Pro](https://ai-engine.meowapps.com/)** (plugin Meow Apps)
 - **[Polylang](https://wordpress.org/plugins/polylang/)** (gratuit ou Pro)
-- **[AI Engine Elevatio](https://github.com/cyrilgogon/ai-engine-elevatio)** v2.6.0+ (recommandé)
+- **[AI Engine Elevatio](https://github.com/cyrilgodon/ai-engine-elevatio)** v2.6.0+ (recommandé)
 
 ### Installation Classique
 
@@ -48,7 +48,7 @@
 
 ```bash
 cd wp-content/plugins/
-git clone https://github.com/cyrilgogon/ai-engine-multilang.git
+git clone https://github.com/cyrilgodon/ai-engine-multilang.git
 cd ai-engine-multilang/
 composer install
 npm install
@@ -268,7 +268,7 @@ git push origin feat/nouvelle-fonctionnalite
 
 ## 📞 Support
 
-- **Bugs** : Ouvrir une issue sur [GitHub](https://github.com/cyrilgogon/ai-engine-multilang/issues)
+- **Bugs** : Ouvrir une issue sur [GitHub](https://github.com/cyrilgodon/ai-engine-multilang/issues)
 - **Questions** : Consulter la [documentation complète](docs/)
 - **Contact** : [contact@elevatio.fr](mailto:contact@elevatio.fr)
 
@@ -283,4 +283,5 @@ GPL-2.0-or-later
 **Développé pour Elevatio** 🚀  
 **Par Cyril Godon**  
 https://elevatio.fr
+
 

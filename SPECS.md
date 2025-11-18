@@ -711,7 +711,7 @@ Voir **[GITHUB-UPDATES-WORKFLOW.md](GITHUB-UPDATES-WORKFLOW.md)** pour détails.
 
 - **Documentation complète** : [README.md](README.md)
 - **Guide rapide** : [QUICK-START.md](QUICK-START.md)
-- **Issues GitHub** : https://github.com/cyrilgogon/ai-engine-multilang/issues
+- **Issues GitHub** : https://github.com/cyrilgodon/ai-engine-multilang/issues
 - **Contact** : contact@elevatio.fr
 
 ---
@@ -719,4 +719,5 @@ Voir **[GITHUB-UPDATES-WORKFLOW.md](GITHUB-UPDATES-WORKFLOW.md)** pour détails.
 **Document maintenu par :** Elevatio / Cyril Godon  
 **Dernière mise à jour :** 2025-11-18  
 **Version du plugin :** 1.0.0
+
 
