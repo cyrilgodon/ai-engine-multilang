@@ -1,6 +1,13 @@
 # 🚀 START HERE - AI Engine Multilang by Elevatio
 
-**Plugin complet et prêt à déployer !** 🎉
+**Plugin complet et déployé en v1.0.1 !** 🎉
+
+## ⚡ Version 1.0.1 - Correction Polylang Pro
+
+✅ **CORRECTION APPLIQUÉE** : Le plugin détecte maintenant correctement Polylang Pro à l'activation
+- Support complet de `polylang-pro/polylang.php`
+- Détection multi-méthodes robuste (constante, fonction, classe, plugins actifs)
+- Message d'erreur clarifié
 
 ---
 
