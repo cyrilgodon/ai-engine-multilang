@@ -3,7 +3,7 @@
  * Plugin Name: AI Engine Multilang by Elevatio
  * Plugin URI: https://github.com/cyrilgodon/ai-engine-multilang
  * Description: Gestion multilingue complète pour AI Engine avec Polylang. Détecte les changements de langue et traduit automatiquement l'interface du chatbot (textes UI, Quick Actions). Requiert AI Engine, Polylang et AI Engine Elevatio.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Elevatio / Cyril Godon
  * Author URI: https://elevatio.fr
  * License: GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // CONSTANTES DU PLUGIN
 // ============================================================================
 
-define( 'EAI_ML_VERSION', '1.0.1' );
+define( 'EAI_ML_VERSION', '1.0.2' );
 define( 'EAI_ML_PLUGIN_FILE', __FILE__ );
 define( 'EAI_ML_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EAI_ML_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -75,23 +75,9 @@ function eai_ml_check_dependencies() {
 	}
 	
 	// Vérifier Polylang (gratuit ou Pro)
-	// Méthode 1 : Vérifier si fonction existe (après chargement)
-	// Méthode 2 : Vérifier si constante POLYLANG_VERSION existe
-	// Méthode 3 : Vérifier si plugins sont actifs
-	$polylang_active = defined( 'POLYLANG_VERSION' ) 
-		|| function_exists( 'pll_current_language' )
-		|| class_exists( 'Polylang' )
-		|| ( function_exists( 'is_plugin_active' ) && (
-			is_plugin_active( 'polylang/polylang.php' ) 
-			|| is_plugin_active( 'polylang-pro/polylang.php' )
-		) );
-	
-	if ( ! $polylang_active ) {
-		$missing[] = array(
-			'name' => 'Polylang ou Polylang Pro',
-			'url'  => 'https://wordpress.org/plugins/polylang/',
-		);
-	}
+	// Note : On ne vérifie PAS Polylang à l'activation car les fonctions/classes
+	// ne sont pas encore chargées à ce moment. On vérifie uniquement au runtime
+	// via plugins_loaded. Si Polylang manque au runtime, une notice sera affichée.
 	
 	return $missing;
 }
@@ -112,16 +98,15 @@ function eai_ml_check_elevatio_compatibility() {
 }
 
 /**
- * Hook d'activation : vérifier les dépendances.
+ * Hook d'activation : vérifier les dépendances critiques uniquement.
+ * 
+ * Note : Polylang n'est PAS vérifié ici car ses fonctions/classes ne sont pas
+ * encore chargées au moment de l'activation. La vérification se fait au runtime
+ * via admin_notices.
  * 
  * @since 1.0.0
  */
 function eai_ml_activate() {
-	// Charger plugin.php pour is_plugin_active()
-	if ( ! function_exists( 'is_plugin_active' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	}
-	
 	$missing = eai_ml_check_dependencies();
 	
 	if ( ! empty( $missing ) ) {
@@ -176,11 +161,26 @@ register_deactivation_hook( __FILE__, 'eai_ml_deactivate' );
 // ============================================================================
 
 /**
- * Afficher une notice si AI Engine Elevatio est trop ancien.
+ * Afficher une notice si dépendances manquantes au runtime.
  * 
- * @since 1.0.0
+ * @since 1.0.1
  */
-function eai_ml_elevatio_version_warning() {
+function eai_ml_runtime_dependencies_check() {
+	// Vérifier Polylang au runtime (après chargement des plugins)
+	if ( ! function_exists( 'pll_current_language' ) ) {
+		?>
+		<div class="notice notice-error">
+			<p>
+				<strong><?php esc_html_e( 'AI Engine Multilang :', 'ai-engine-multilang' ); ?></strong>
+				<?php esc_html_e( 'Ce plugin nécessite Polylang ou Polylang Pro. Veuillez installer et activer Polylang.', 'ai-engine-multilang' ); ?>
+				<a href="https://wordpress.org/plugins/polylang/" target="_blank"><?php esc_html_e( 'Télécharger Polylang', 'ai-engine-multilang' ); ?></a>
+			</p>
+		</div>
+		<?php
+		return; // Sortir si Polylang manque
+	}
+	
+	// Vérifier AI Engine Elevatio version si installé
 	if ( ! eai_ml_check_elevatio_compatibility() ) {
 		?>
 		<div class="notice notice-warning">
@@ -198,7 +198,7 @@ function eai_ml_elevatio_version_warning() {
 		<?php
 	}
 }
-add_action( 'admin_notices', 'eai_ml_elevatio_version_warning' );
+add_action( 'admin_notices', 'eai_ml_runtime_dependencies_check' );
 
 // ============================================================================
 // INITIALISATION DU PLUGIN

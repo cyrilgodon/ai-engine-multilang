@@ -7,6 +7,31 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [1.0.2] - 2025-11-18
+
+### 🐛 Fixed (Corrections Critiques)
+
+- **Vérification Polylang à l'activation** : Polylang n'est PLUS vérifié au hook d'activation
+  - **Raison** : Les fonctions/classes de Polylang ne sont pas encore chargées au moment de l'activation
+  - **Solution** : Vérification déplacée au runtime via `admin_notices` (après `plugins_loaded`)
+  - Le plugin s'active maintenant SANS ERREUR même si Polylang n'est pas encore chargé
+- **Notice admin intelligente** : Affichage d'une notice d'erreur dans l'admin si Polylang manque au runtime
+  - Notice rouge avec lien de téléchargement Polylang
+  - Vérification uniquement après chargement complet des plugins
+
+### 📝 Technical Details
+
+- Hook `eai_ml_activate()` : Vérifie uniquement AI Engine (via `class_exists('Meow_MWAI_Core')`)
+- Nouvelle fonction `eai_ml_runtime_dependencies_check()` : Vérifie Polylang via `admin_notices`
+- Amélioration expérience utilisateur : Plugin activable, puis notice explicative si dépendance manquante
+
+### 🎯 Impact Utilisateur
+
+**Avant v1.0.2** : Impossible d'activer le plugin → Message d'erreur bloquant  
+**Après v1.0.2** : Plugin s'active → Notice admin si Polylang manque (non-bloquant)
+
+---
+
 ## [1.0.1] - 2025-11-18
 
 ### 🐛 Fixed (Corrections)
