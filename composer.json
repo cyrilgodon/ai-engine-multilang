@@ -1,0 +1,30 @@
+{
+    "name": "elevatio/ai-engine-multilang",
+    "description": "Gestion multilingue complète pour AI Engine avec Polylang. Détecte les changements de langue et traduit automatiquement l'interface du chatbot.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Elevatio",
+            "email": "contact@elevatio.fr",
+            "homepage": "https://elevatio.fr"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "yahnis-elsts/plugin-update-checker": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "EAI_ML\\": "includes/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
+

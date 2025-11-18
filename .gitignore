@@ -1,0 +1,62 @@
+# WordPress
+.htaccess
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/
+wp-content/cache/supercache/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Composer
+vendor/
+composer.lock
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Build artifacts (on garde les .min.js pour distribution)
+# Si tu veux les exclure : décommenter les lignes ci-dessous
+# assets/js/*.min.js
+# assets/js/*.dev.min.js
+# assets/css/*.min.css
+
+# Logs
+*.log
+debug.log
+error_log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Distribution (si tu crées des ZIP)
+*.zip
+dist/
+release/
+

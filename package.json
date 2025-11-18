@@ -1,0 +1,30 @@
+{
+  "name": "ai-engine-multilang",
+  "version": "1.0.0",
+  "description": "Gestion multilingue pour AI Engine avec Polylang",
+  "main": "index.js",
+  "scripts": {
+    "watch": "node build.js --watch",
+    "build:dev": "node build.js --dev",
+    "build": "node build.js --prod",
+    "build:all": "node build.js --all",
+    "clean": "node build.js --clean"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "ai-engine",
+    "polylang",
+    "multilingual",
+    "chatbot",
+    "reflexivo"
+  ],
+  "author": "Elevatio",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "esbuild": "^0.19.0",
+    "javascript-obfuscator": "^4.1.0"
+  }
+}
+
