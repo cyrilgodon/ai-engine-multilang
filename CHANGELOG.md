@@ -7,6 +7,34 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [1.0.4] - 2025-11-18
+
+### 🐛 Fixed (Correction Critique)
+
+- **Suppression `Requires Plugins:`** : Le header WordPress natif ne fonctionne PAS avec les plugins premium
+  - Polylang Pro et AI Engine Pro ne sont PAS sur WordPress.org
+  - WordPress ne peut donc PAS détecter ces dépendances via `Requires Plugins:`
+  - Le plugin ne s'activait jamais à cause de cette limitation
+- **Vérification au runtime** : Retour à une vérification simple mais efficace
+  - Vérification dans `plugins_loaded` (après chargement de tous les plugins)
+  - Si dépendances manquantes : le plugin ne fait rien (graceful degradation)
+  - Pas d'erreur, pas de plantage, pas de notice admin invasive
+  - Log debug si WP_DEBUG activé
+- **Activation toujours possible** : Le plugin s'active maintenant SANS VÉRIFICATION
+  - L'utilisateur peut activer le plugin même si Polylang/AI Engine manquent
+  - Le plugin reste simplement inactif jusqu'à installation des dépendances
+
+### 📝 Leçon Réelle
+
+Le header `Requires Plugins:` de WordPress est INUTILE pour les plugins premium car :
+1. Il ne fonctionne QUE pour les plugins du repo WordPress.org
+2. Les plugins premium (Polylang Pro, AI Engine Pro, etc.) ne sont PAS détectables
+3. WordPress bloque l'activation même si le plugin premium est installé
+
+**Solution pragmatique** : Vérification runtime + graceful degradation (pas d'erreur).
+
+---
+
 ## [1.0.3] - 2025-11-18
 
 ### 🧹 Refactoring (Simplification Majeure)

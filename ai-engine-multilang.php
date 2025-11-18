@@ -3,7 +3,7 @@
  * Plugin Name: AI Engine Multilang by Elevatio
  * Plugin URI: https://github.com/cyrilgodon/ai-engine-multilang
  * Description: Gestion multilingue complète pour AI Engine avec Polylang. Détecte les changements de langue et traduit automatiquement l'interface du chatbot (textes UI, Quick Actions). Requiert AI Engine, Polylang et AI Engine Elevatio.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Elevatio / Cyril Godon
  * Author URI: https://elevatio.fr
  * License: GPL-2.0+
@@ -12,7 +12,6 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Requires Plugins: ai-engine, polylang
  * Update URI: https://github.com/cyrilgodon/ai-engine-multilang
  * 
  * @package AI_Engine_Multilang
@@ -27,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // CONSTANTES DU PLUGIN
 // ============================================================================
 
-define( 'EAI_ML_VERSION', '1.0.3' );
+define( 'EAI_ML_VERSION', '1.0.4' );
 define( 'EAI_ML_PLUGIN_FILE', __FILE__ );
 define( 'EAI_ML_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EAI_ML_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -56,10 +55,14 @@ if ( file_exists( EAI_ML_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 /**
  * Hook d'activation.
  * 
- * Note : Les dépendances (AI Engine, Polylang) sont gérées nativement par
- * WordPress via le header "Requires Plugins". Pas besoin de vérification custom.
+ * Note : Pas de vérification de dépendances à l'activation. Le plugin s'active
+ * toujours et vérifie les dépendances au runtime (plugins_loaded). Si AI Engine
+ * ou Polylang manquent, le plugin ne fait rien (graceful degradation).
  * 
- * @since 1.0.3
+ * Raison : AI Engine Pro et Polylang Pro sont des plugins premium non présents
+ * sur WordPress.org, donc le système "Requires Plugins:" ne peut pas les détecter.
+ * 
+ * @since 1.0.4
  */
 function eai_ml_activate() {
 	// Log d'activation
@@ -89,17 +92,32 @@ register_deactivation_hook( __FILE__, 'eai_ml_deactivate' );
 /**
  * Initialiser le plugin AI Engine Multilang.
  * 
- * Charge les classes et initialise les modules.
- * Priorité 20 pour charger APRÈS AI Engine et Elevatio.
+ * Charge les classes et initialise les modules UNIQUEMENT si les dépendances
+ * sont présentes. Priorité 20 pour charger APRÈS AI Engine et Elevatio.
  * 
- * Note : Les dépendances sont gérées par WordPress via "Requires Plugins".
- * Si elles manquent, WordPress affiche automatiquement un message et empêche
- * l'activation du plugin.
+ * Si AI Engine ou Polylang manquent, le plugin ne fait rien (graceful degradation).
+ * Pas d'erreur, pas de plantage, juste inactif.
  * 
  * @since 1.0.0
  */
 function eai_ml_init() {
-	// Charger les modules
+	// Vérifier Polylang (obligatoire)
+	if ( ! function_exists( 'pll_current_language' ) ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[AI Engine Multilang v' . EAI_ML_VERSION . '] Polylang not found, plugin inactive' );
+		}
+		return; // Sortir silencieusement
+	}
+	
+	// Vérifier AI Engine (obligatoire)
+	if ( ! class_exists( 'Meow_MWAI_Core' ) ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[AI Engine Multilang v' . EAI_ML_VERSION . '] AI Engine not found, plugin inactive' );
+		}
+		return; // Sortir silencieusement
+	}
+	
+	// Les 2 dépendances sont présentes, charger les modules
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-ui-translator.php';
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-qa-translator.php';
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-conversation-handler.php';
@@ -114,7 +132,7 @@ function eai_ml_init() {
 		error_log( sprintf(
 			'[AI Engine Multilang v%s] Plugin initialized | Polylang: %s | Elevatio: %s',
 			EAI_ML_VERSION,
-			function_exists( 'pll_current_language' ) ? pll_current_language() : 'N/A',
+			pll_current_language() ?: 'N/A',
 			defined( 'EAI_VERSION' ) ? EAI_VERSION : 'Not installed'
 		) );
 	}
