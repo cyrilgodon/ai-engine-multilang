@@ -13,6 +13,7 @@
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Requires Plugins: ai-engine, polylang
+ * Update URI: https://github.com/cyrilgodon/ai-engine-multilang
  * 
  * @package AI_Engine_Multilang
  * @version 1.0.0
