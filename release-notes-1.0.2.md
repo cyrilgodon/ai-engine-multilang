@@ -30,3 +30,4 @@
 
 **IMPORTANT** : Cette version corrige le bug critique empêchant l'activation du plugin. Mettez à jour immédiatement si vous utilisez v1.0.0 ou v1.0.1.
 
+

@@ -120,3 +120,4 @@ if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 	error_log( '[AI Engine Multilang] Uninstall complete - All data removed' );
 }
 
+

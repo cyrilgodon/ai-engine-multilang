@@ -721,3 +721,4 @@ Voir **[GITHUB-UPDATES-WORKFLOW.md](GITHUB-UPDATES-WORKFLOW.md)** pour détails.
 **Version du plugin :** 1.0.0
 
 
+

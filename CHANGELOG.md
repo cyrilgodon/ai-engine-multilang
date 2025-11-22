@@ -7,6 +7,90 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [1.0.7] - 2025-11-18
+
+### 🐛 Corrections de Bugs
+
+- **Fix popup réaffichée en boucle** : La popup de changement de langue ne se réaffiche plus en boucle quand l'utilisateur clique sur "Terminer la discussion actuelle"
+  - **Cause** : La dernière langue n'était pas mise à jour dans localStorage lors du clic sur "Terminer la discussion actuelle"
+  - **Solution** : Ajout de `localStorage.setItem(LS_KEY, CURRENT_LANG)` dans le handler du bouton `btnFinish`
+  - **Impact** : Plus de popup intempestive après avoir choisi de terminer la conversation dans l'ancienne langue
+  - Fichier modifié : `assets/js/conversation-handler.js` (ligne 379)
+
+---
+
+## [1.0.6] - 2025-11-18
+
+### ⚠️ BREAKING CHANGE
+
+- **Traductions UI depuis configuration AI Engine** : Les traductions des textes UI (startSentence, textSend, etc.) ne sont plus codées en dur dans le plugin
+  - Les textes doivent maintenant être configurés dans AI Engine avec le format `[fr]Texte FR[en]Text EN[es]Texto ES`
+  - Le plugin parse automatiquement ces textes et extrait la langue active
+  - **Migration requise** : Ajouter les tags de langue dans la configuration AI Engine (voir CONFIGURATION-EXEMPLES.md)
+
+### ✨ Nouvelles Fonctionnalités
+
+- **Detection de présence du chatbot** : La popup de changement de langue ne s'affiche que si un chatbot est présent sur la page
+- **Récupération du nom du bot** : Le nom du chatbot (aiName) est maintenant extrait des paramètres AI Engine et affiché dans la popup
+- **Différenciation de contexte** : Deux messages différents selon le scénario
+  - Cas 1 : Changement de langue sur la page actuelle (< 10 secondes)
+  - Cas 2 : Arrivée sur la page avec une langue différente depuis le dernier échange
+- **Noms complets des langues** : Affichage en toutes lettres (français, anglais, espagnol, etc.) dans les messages de la popup
+- **Boutons contextuels** : Les boutons affichent les noms des langues source et cible
+
+### 📚 Documentation
+
+- **CONFIGURATION-EXEMPLES.md** : Nouveau guide complet avec exemples de configuration des textes multilingues dans AI Engine
+  - Exemples pour tous les champs supportés (startSentence, textSend, textClear, etc.)
+  - Bonnes pratiques et pièges à éviter
+  - Guide de migration depuis les traductions en dur
+
+### 🔧 Modifications
+
+- Refactorisation complète de `class-ui-translator.php` pour parser les textes depuis AI Engine au lieu de les avoir en dur
+- Ajout de la fonction `parse_multilang_text()` pour extraire les traductions selon la langue active
+- Support de 8 champs UI : textSend, textClear, textInputPlaceholder, startSentence, headerSubtitle, textCompliance, aiName, userName
+- Logging amélioré avec détails sur les textes parsés
+
+---
+
+## [1.0.5] - 2025-11-18
+
+### ✨ Nouvelles Fonctionnalités
+
+- **Filtre de prompts multilingues** : Ajout d'un système complet de filtrage des prompts par langue
+  - Économie jusqu'à 40% de tokens en envoyant uniquement le contenu de la langue active
+  - Support de la syntaxe `[LANG:XX]...[/LANG:XX]` pour les blocs de langue
+  - Placeholders `{{LANGUAGE}}` et `{{LANGUAGE_NAME}}` remplacés automatiquement
+  - Cache intelligent avec transients WordPress (1h)
+  - Logging complet avec métriques d'économie de tokens
+  - Mode dégradé en cas d'erreur
+
+- **Page d'administration** : Nouvelle interface de configuration dans Paramètres → Multilingue
+  - Configuration des langues supportées (FR, EN, ES, DE, IT, PT)
+  - Langue par défaut configurable
+  - Activation/désactivation du filtrage de prompts
+  - Configuration de la priorité du hook (pour compatibilité avec d'autres plugins)
+  - Mode debug pour le développement
+  - Documentation intégrée de la syntaxe multilingue
+
+### 🔧 Modifications
+
+- **Migration depuis AI Engine Elevatio** : Le filtre de prompts multilingues est maintenant dans ce plugin
+  - Permet la réutilisation pour d'autres projets
+  - Fonctionne de manière autonome (ne nécessite PAS AI Engine Elevatio)
+  - Compatible avec AI Engine Elevatio si présent (interface `EAI_Pipeline_Nameable`)
+  - Code adapté avec préfixe `EAI_ML_` au lieu de `EAI_`
+
+### 📝 Notes techniques
+
+- Nouvelle classe : `EAI_ML_Prompt_Filter` (filtre de prompts)
+- Nouvelle classe : `EAI_ML_Admin_Settings` (page d'administration)
+- Interface optionnelle : Implémente `EAI_Pipeline_Nameable` si disponible (compatibilité Elevatio)
+- Hook : `mwai_ai_instructions` (priorité configurable, défaut: 5)
+
+---
+
 ## [1.0.4] - 2025-11-18
 
 ### 🐛 Fixed (Correction Critique)

@@ -53,12 +53,13 @@ class EAI_ML_QA_Translator {
 	 * @since 1.0.0
 	 */
 	public function init() {
-		add_filter( 'mwai_chatbot_shortcuts', array( $this, 'translate_quick_actions' ), 20, 2 );
+		// Priorité 999 pour être sûr d'être exécuté EN DERNIER
+		add_filter( 'mwai_chatbot_shortcuts', array( $this, 'translate_quick_actions' ), 999, 2 );
 
 		// Log d'initialisation
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( sprintf(
-				'[AI Engine Multilang v%s] QA Translator: Hook registered (priority 20)',
+				'[AI Engine Multilang v%s] QA Translator: Initialized',
 				EAI_ML_VERSION
 			) );
 		}
@@ -90,63 +91,69 @@ class EAI_ML_QA_Translator {
 	public function translate_quick_actions( $shortcuts, $args ) {
 		$lang = $this->get_current_language();
 
+		// Si pas de shortcuts, retourner tel quel
+		if ( empty( $shortcuts ) ) {
+			return $shortcuts;
+		}
+
 		// Pattern pour extraire les traductions : "texte [code]"
 		// Regex : cherche du texte suivi de [xx] où xx est le code langue
 		$pattern = '/([^|]+)\[(' . preg_quote( $lang, '/' ) . ')\]/i';
 
 		$translated_count = 0;
+		$unchanged_count = 0;
 
 		foreach ( $shortcuts as &$shortcut ) {
-			if ( ! isset( $shortcut['label'] ) ) {
+			// Les Quick Actions ont leur label dans $shortcut['data']['label']
+			if ( ! isset( $shortcut['data'] ) ) {
 				continue;
 			}
 
-			$original_label = $shortcut['label'];
+			// Traduire le label
+			if ( isset( $shortcut['data']['label'] ) ) {
+				$original_label = $shortcut['data']['label'];
 
-			// Vérifier si format multilingue (contient au moins un tag [xx])
-			if ( ! preg_match( '/\[(?:fr|en|es|de|it|pt|nl|pl|ru|ja|zh)\]/i', $original_label ) ) {
-				// Pas de tag multilingue, on garde tel quel
-				continue;
-			}
-
-			// Chercher la traduction pour la langue active
-			if ( preg_match( $pattern, $original_label, $matches ) ) {
-				// $matches[1] = le texte avant [xx]
-				$shortcut['label'] = trim( $matches[1] );
-				$translated_count++;
-
-				// Log pour debug
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log( sprintf(
-						'[AI Engine Multilang v%s] QA Translator: "%s" → "%s" (lang: %s)',
-						EAI_ML_VERSION,
-						$this->truncate( $original_label, 50 ),
-						$shortcut['label'],
-						$lang
-					) );
+				// Vérifier si format multilingue (contient au moins un tag [xx])
+				if ( preg_match( '/\[(?:fr|en|es|de|it|pt|nl|pl|ru|ja|zh)\]/i', $original_label ) ) {
+					// Chercher la traduction pour la langue active
+					if ( preg_match( $pattern, $original_label, $matches ) ) {
+						$shortcut['data']['label'] = trim( $matches[1] );
+						$translated_count++;
+					} else {
+						// Fallback français
+						if ( preg_match( '/([^|]+)\[fr\]/i', $original_label, $fallback_matches ) ) {
+							$shortcut['data']['label'] = trim( $fallback_matches[1] );
+							$translated_count++;
+						}
+					}
+				} else {
+					$unchanged_count++;
 				}
-			} else {
-				// Langue active non trouvée, fallback français
-				if ( preg_match( '/([^|]+)\[fr\]/i', $original_label, $fallback_matches ) ) {
-					$shortcut['label'] = trim( $fallback_matches[1] );
-					$translated_count++;
+			}
 
-					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-						error_log( sprintf(
-							'[AI Engine Multilang v%s] QA Translator: Fallback FR for "%s" (requested lang: %s not found)',
-							EAI_ML_VERSION,
-							$this->truncate( $original_label, 50 ),
-							$lang
-						) );
+			// Traduire aussi le message
+			if ( isset( $shortcut['data']['message'] ) ) {
+				$original_message = $shortcut['data']['message'];
+
+				// Vérifier si format multilingue
+				if ( preg_match( '/\[(?:fr|en|es|de|it|pt|nl|pl|ru|ja|zh)\]/i', $original_message ) ) {
+					// Chercher la traduction pour la langue active
+					if ( preg_match( $pattern, $original_message, $matches ) ) {
+						$shortcut['data']['message'] = trim( $matches[1] );
+					} else {
+						// Fallback français
+						if ( preg_match( '/([^|]+)\[fr\]/i', $original_message, $fallback_matches ) ) {
+							$shortcut['data']['message'] = trim( $fallback_matches[1] );
+						}
 					}
 				}
 			}
 		}
 
-		// Log résumé
+		// Log résumé uniquement si traductions effectuées
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $translated_count > 0 ) {
 			error_log( sprintf(
-				'[AI Engine Multilang v%s] QA Translator: Translated %d Quick Action(s) for lang "%s"',
+				'[AI Engine Multilang v%s] QA Translator: Translated %d Quick Actions (lang: %s)',
 				EAI_ML_VERSION,
 				$translated_count,
 				$lang

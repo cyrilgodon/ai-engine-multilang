@@ -3,8 +3,8 @@
  * Plugin Name: AI Engine Multilang by Elevatio
  * Plugin URI: https://github.com/cyrilgodon/ai-engine-multilang
  * Description: Gestion multilingue complète pour AI Engine avec Polylang. Détecte les changements de langue et traduit automatiquement l'interface du chatbot (textes UI, Quick Actions). Requiert AI Engine, Polylang et AI Engine Elevatio.
- * Version: 1.0.4
- * Author: Elevatio / Cyril Godon
+ * Version: 1.4.1
+ * Author: Elevatio
  * Author URI: https://elevatio.fr
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -26,11 +26,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 // CONSTANTES DU PLUGIN
 // ============================================================================
 
-define( 'EAI_ML_VERSION', '1.0.4' );
+define( 'EAI_ML_VERSION', '1.4.1' );
 define( 'EAI_ML_PLUGIN_FILE', __FILE__ );
 define( 'EAI_ML_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EAI_ML_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'EAI_ML_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+
+// ============================================================================
+// INTERFACE : Pipeline Nameable (chargée AVANT plugins_loaded)
+// ============================================================================
+// Charger l'interface stub IMMÉDIATEMENT pour compatibilité avec AI Engine Elevatio.
+// Elevatio se charge en priorité 2-6, donc l'interface doit exister avant.
+if ( ! interface_exists( 'EAI_Pipeline_Nameable' ) ) {
+	interface EAI_Pipeline_Nameable {
+		public function get_pipeline_name();
+		public function get_pipeline_icon();
+		public function get_pipeline_description();
+	}
+}
 
 // ============================================================================
 // 🚀 PLUGIN UPDATE CHECKER - GitHub Integration
@@ -121,11 +134,32 @@ function eai_ml_init() {
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-ui-translator.php';
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-qa-translator.php';
 	require_once EAI_ML_PLUGIN_DIR . 'includes/class-conversation-handler.php';
+	require_once EAI_ML_PLUGIN_DIR . 'includes/class-prompt-filter.php';
+	require_once EAI_ML_PLUGIN_DIR . 'includes/class-admin-settings.php';
 	
 	// Initialiser les modules
 	EAI_ML_UI_Translator::get_instance()->init();
 	EAI_ML_QA_Translator::get_instance()->init();
 	EAI_ML_Conversation_Handler::get_instance()->init();
+	
+	// Initialiser la page admin
+	EAI_ML_Admin_Settings::get_instance();
+	
+	// Initialiser le filtre de prompts multilingues
+	$settings = get_option( 'eai_ml_settings', array( 'prompt_filter_enabled' => true, 'prompt_filter_priority' => 5 ) );
+	
+	// LOG FORCÉ pour diagnostic
+	error_log( '🔥 [AI Engine Multilang] Prompt Filter Settings: ' . print_r( $settings, true ) );
+	
+	if ( ! empty( $settings['prompt_filter_enabled'] ) ) {
+		$prompt_filter = EAI_ML_Prompt_Filter::get_instance();
+		$priority = isset( $settings['prompt_filter_priority'] ) ? absint( $settings['prompt_filter_priority'] ) : 5;
+		add_filter( 'mwai_ai_instructions', array( $prompt_filter, 'filter_prompt' ), $priority, 2 );
+		
+		error_log( "🔥 [AI Engine Multilang] Prompt Filter ENABLED with priority {$priority} 🔥" );
+	} else {
+		error_log( '❌ [AI Engine Multilang] Prompt Filter DISABLED in settings' );
+	}
 	
 	// Log d'initialisation
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {

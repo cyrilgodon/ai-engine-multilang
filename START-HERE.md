@@ -1,6 +1,15 @@
 # 🚀 START HERE - AI Engine Multilang by Elevatio
 
-**Plugin complet et déployé en v1.0.1 !** 🎉
+**Plugin complet et déployé en v1.0.7 !** 🎉
+
+## ⚡ Version 1.0.7 - Fix Popup Réaffichée
+
+✅ **CORRECTION APPLIQUÉE** : La popup ne se réaffiche plus en boucle
+- Fix du bug où la popup s'affichait à chaque rechargement même si le bot était dans la bonne langue
+- La langue est maintenant correctement mise à jour dans localStorage même si l'utilisateur choisit "Terminer la discussion actuelle"
+- Plus de popup intempestive ! 🎉
+
+---
 
 ## ⚡ Version 1.0.1 - Correction Polylang Pro
 

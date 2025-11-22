@@ -38,18 +38,10 @@ class EAI_ML_UI_Translator {
 	private $current_lang;
 
 	/**
-	 * Tableau des traductions UI par langue.
-	 *
-	 * @var array
-	 */
-	private $translations = array();
-
-	/**
 	 * Constructeur privé (Singleton).
 	 */
 	private function __construct() {
 		$this->current_lang = $this->get_current_language();
-		$this->load_translations();
 	}
 
 	/**
@@ -70,16 +62,93 @@ class EAI_ML_UI_Translator {
 	 * @since 1.0.0
 	 */
 	public function init() {
-		add_filter( 'mwai_chatbot_params', array( $this, 'translate_ui_texts' ), 10, 1 );
+		// Intercepter le HTML retourné par le shortcode [mwai_chatbot]
+		// pour modifier le JSON dans data-params (approche propre : parse JSON, modifie, réencode)
+		add_filter( 'do_shortcode_tag', array( $this, 'intercept_chatbot_html' ), 10, 4 );
 
 		// Log d'initialisation
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( sprintf(
-				'[AI Engine Multilang v%s] UI Translator: Hook registered (priority 10) | Lang: %s',
+				'[AI Engine Multilang v%s] UI Translator: Initialized (Lang: %s)',
 				EAI_ML_VERSION,
 				$this->current_lang
 			) );
 		}
+	}
+
+	/**
+	 * Intercepter le HTML du shortcode [mwai_chatbot] pour traduire les textes UI.
+	 * Approche propre : parse le JSON data-params, modifie, réencode, remplace.
+	 *
+	 * @param string $output Le HTML retourné par le shortcode.
+	 * @param string $tag Le nom du shortcode.
+	 * @param array $attr Les attributs du shortcode.
+	 * @param array $m Les résultats du regex match.
+	 * @return string Le HTML modifié avec les traductions.
+	 */
+	public function intercept_chatbot_html( $output, $tag, $attr, $m ) {
+		// Ne traiter que le shortcode mwai_chatbot
+		if ( $tag !== 'mwai_chatbot' ) {
+			return $output;
+		}
+
+		// Parser le data-params avec une regex PROPRE
+		if ( ! preg_match( "/data-params='([^']+)'/", $output, $matches ) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( '[AI Engine Multilang] UI Translator: No data-params found in chatbot HTML' );
+			}
+			return $output;
+		}
+
+		// Décoder le JSON
+		$json_encoded = $matches[1];
+		$params = json_decode( html_entity_decode( $json_encoded ), true );
+
+		if ( ! $params ) {
+			error_log( '[AI Engine Multilang] UI Translator ERROR: Failed to decode data-params JSON' );
+			return $output;
+		}
+
+		// Clés des textes UI à traduire (en camelCase car déjà converties par AI Engine)
+		$ui_text_keys = [
+			'textSend',
+			'textClear',
+			'textInputPlaceholder',
+			'textCompliance',
+			'startSentence',
+			'iconText',
+			'headerSubtitle',
+			'popupTitle'
+		];
+
+		$translated_count = 0;
+		foreach ( $ui_text_keys as $key ) {
+			if ( isset( $params[ $key ] ) && ! empty( $params[ $key ] ) ) {
+				$original = $params[ $key ];
+				$translated = $this->parse_multilang_text( $original, $this->current_lang );
+				
+				if ( $translated !== $original ) {
+					$params[ $key ] = $translated;
+					$translated_count++;
+				}
+			}
+		}
+
+		// Log résumé uniquement si WP_DEBUG
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $translated_count > 0 ) {
+			error_log( sprintf(
+				'[AI Engine Multilang v%s] UI Translator: Translated %d UI texts (lang: %s)',
+				EAI_ML_VERSION,
+				$translated_count,
+				$this->current_lang
+			) );
+		}
+
+		// Ré-encoder le JSON et remplacer dans le HTML
+		$new_json_encoded = htmlspecialchars( json_encode( $params ), ENT_QUOTES, 'UTF-8' );
+		$output = str_replace( "data-params='$json_encoded'", "data-params='$new_json_encoded'", $output );
+
+		return $output;
 	}
 
 	/**
@@ -95,34 +164,83 @@ class EAI_ML_UI_Translator {
 	}
 
 	/**
-	 * Charger les traductions UI pour toutes les langues supportées.
+	 * Parser un texte multilingue avec tags.
 	 *
+	 * Supporte 2 formats :
+	 * - Format 1 (avec pipe) : "Texte [fr]|Text [en]|Texto [es]"
+	 * - Format 2 (sans pipe) : "[fr]Texte[en]Text[es]Texto"
+	 * 
 	 * @since 1.0.0
+	 * @param string $text Texte avec tags multilingues.
+	 * @param string $lang Code langue cible (fr, en, es, en-us, etc.).
+	 * @return string Texte extrait pour la langue, ou texte original si pas de tag trouvé.
 	 */
-	private function load_translations() {
+	private function parse_multilang_text( $text, $lang ) {
+		if ( empty( $text ) || ! is_string( $text ) ) {
+			return $text;
+		}
+
+		// Normaliser le code langue : en-us → en
+		$lang_short = substr( $lang, 0, 2 );
+
+		// FORMAT 1 : Avec pipe "Texte [fr]|Text [en]|Texto [es]"
+		// Pattern : cherche "quelque chose [code]" précédé ou suivi d'un pipe ou début/fin
+		// \s* ignore les espaces/retours à la ligne après le pipe
+		$pattern_pipe = '/(?:^|\|)\s*([^|\[]+?)\s*\[' . preg_quote( $lang_short, '/' ) . '\]/is';
+		
+		if ( preg_match( $pattern_pipe, $text, $matches ) ) {
+			return trim( $matches[1] );
+		}
+
+		// FORMAT 2 : Sans pipe "[fr]Texte[en]Text[es]Texto"
+		$lang_tag_pattern = '\[(?:[a-z]{2}(?:-[a-z]{2})?)\]';
+		$pattern_no_pipe = '/\[' . preg_quote( $lang_short, '/' ) . '\](.*?)(?:' . $lang_tag_pattern . '|$)/s';
+		
+		if ( preg_match( $pattern_no_pipe, $text, $matches ) ) {
+			return trim( $matches[1] );
+		}
+
+		// Si pas de tag trouvé, retourner le texte original
+		return $text;
+	}
+
+	/**
+	 * Récupérer les traductions par défaut pour les champs UI courants.
+	 *
+	 * @since 1.0.6
+	 * @return array Traductions par défaut par langue et par champ.
+	 */
+	private function get_default_translations() {
 		/**
-		 * Filtrer les traductions UI supportées.
+		 * Filtrer les traductions par défaut des champs UI.
 		 *
-		 * @since 1.0.0
-		 * @param array $translations Tableau des traductions par langue.
+		 * @since 1.0.6
+		 * @param array $defaults Tableau des traductions par défaut.
 		 */
-		$this->translations = apply_filters( 'eai_ml_translations_ui', array(
-			'fr' => array(
-				// FR = pas de surcharge, on garde les valeurs par défaut d'AI Engine
+		return apply_filters( 'eai_ml_default_translations', array(
+			'textSend' => array(
+				'fr' => 'Dire',
+				'en' => 'Say',
+				'es' => 'Decir',
+				'de' => 'Sagen',
+				'it' => 'Dire',
+				'pt' => 'Dizer',
 			),
-			'en' => array(
-				'textSend'             => 'Send',
-				'textClear'            => 'Start over',
-				'textInputPlaceholder' => 'Type your message...',
-				'startSentence'        => 'Hello! I am Reflexivo, your personal coach. How can I help you today?',
-				'headerSubtitle'       => 'Your personal coach',
+			'textClear' => array(
+				'fr' => 'Nouvelle conversation',
+				'en' => 'New conversation',
+				'es' => 'Nueva conversación',
+				'de' => 'Neues Gespräch',
+				'it' => 'Nuova conversazione',
+				'pt' => 'Recomeçar',
 			),
-			'es' => array(
-				'textSend'             => 'Enviar',
-				'textClear'            => 'Empezar de nuevo',
-				'textInputPlaceholder' => 'Escribe tu mensaje...',
-				'startSentence'        => '¡Hola! Soy Reflexivo, tu coach personal. ¿Cómo puedo ayudarte hoy?',
-				'headerSubtitle'       => 'Tu coach personal',
+			'textInputPlaceholder' => array(
+				'fr' => 'Tape ton message...',
+				'en' => 'Type your message...',
+				'es' => 'Escribe tu mensaje...',
+				'de' => 'Schreibe deine Nachricht...',
+				'it' => 'Scrivi il tuo messaggio...',
+				'pt' => 'Digite sua mensagem...',
 			),
 		) );
 	}
@@ -130,42 +248,73 @@ class EAI_ML_UI_Translator {
 	/**
 	 * Hook 'mwai_chatbot_params' : Traduire les textes UI du chatbot.
 	 *
+	 * Parse les textes configurés dans AI Engine avec le format [fr]...[en]...[es]...
+	 * et extrait la traduction correspondant à la langue Polylang active.
+	 * 
+	 * Si un champ ne contient pas de tags multilingues, applique les traductions par défaut
+	 * pour les champs UI courants (textSend, textClear, textInputPlaceholder).
+	 *
 	 * @since 1.0.0
 	 * @param array $params Paramètres du chatbot AI Engine.
-	 * @return array Paramètres modifiés avec traductions.
+	 * @return array Paramètres modifiés avec traductions extraites.
 	 */
 	public function translate_ui_texts( $params ) {
 		// Récupérer langue actuelle (au cas où elle a changé entre init et render)
 		$lang = $this->get_current_language();
 
-		// Si français ou langue non supportée, on garde les valeurs par défaut d'AI Engine
-		if ( 'fr' === $lang || ! isset( $this->translations[ $lang ] ) ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf(
-					'[AI Engine Multilang v%s] UI Translator: No translation needed for lang "%s"',
-					EAI_ML_VERSION,
-					$lang
-				) );
-			}
-			return $params;
-		}
+		// Récupérer les traductions par défaut
+		$default_translations = $this->get_default_translations();
 
-		// Merger les traductions avec les paramètres existants
-		$translated_params = array_merge( $params, $this->translations[ $lang ] );
+		// Liste des champs de texte UI à traduire
+		$translatable_fields = array(
+			'textSend',
+			'textClear',
+			'textInputPlaceholder',
+			'startSentence',
+			'headerSubtitle',
+			'textCompliance',
+			'aiName',
+			'userName',
+		);
+
+		$translated_count = 0;
+		$default_applied = 0;
+
+		// Parser chaque champ s'il contient des tags multilingues
+		foreach ( $translatable_fields as $field ) {
+			if ( isset( $params[ $field ] ) && is_string( $params[ $field ] ) ) {
+				// Vérifier si le texte contient des tags de langue valides
+				// Pattern: [xx] ou [xx-yy] où xx et yy sont exactement 2 lettres minuscules
+				if ( preg_match( '/\[[a-z]{2}(?:-[a-z]{2})?\]/', $params[ $field ] ) ) {
+					$original = $params[ $field ];
+					$parsed = $this->parse_multilang_text( $original, $lang );
+					
+					// Ne remplacer que si on a extrait quelque chose de différent
+					if ( $parsed !== $original ) {
+						$params[ $field ] = $parsed;
+						$translated_count++;
+					}
+				} elseif ( isset( $default_translations[ $field ][ $lang ] ) && 'fr' !== $lang ) {
+					// Si pas de tags ET qu'une traduction par défaut existe ET que la langue n'est pas FR
+					// appliquer la traduction par défaut
+					$params[ $field ] = $default_translations[ $field ][ $lang ];
+					$default_applied++;
+				}
+			}
+		}
 
 		// Log des traductions appliquées
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$translated_keys = array_keys( $this->translations[ $lang ] );
 			error_log( sprintf(
-				'[AI Engine Multilang v%s] UI Translator: Applied %d translations for lang "%s" | Keys: %s',
+				'[AI Engine Multilang v%s] UI Translator: Parsed %d multilang texts, applied %d defaults for lang "%s"',
 				EAI_ML_VERSION,
-				count( $translated_keys ),
-				$lang,
-				implode( ', ', $translated_keys )
+				$translated_count,
+				$default_applied,
+				$lang
 			) );
 		}
 
-		return $translated_params;
+		return $params;
 	}
 
 	/**
@@ -176,16 +325,6 @@ class EAI_ML_UI_Translator {
 	 */
 	public function get_lang() {
 		return $this->current_lang;
-	}
-
-	/**
-	 * Récupérer toutes les traductions (publique, pour usage externe).
-	 *
-	 * @since 1.0.0
-	 * @return array Tableau des traductions.
-	 */
-	public function get_translations() {
-		return $this->translations;
 	}
 }
 

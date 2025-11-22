@@ -145,6 +145,7 @@ class EAI_ML_Conversation_Handler {
 	 * Récupérer les traductions du popup pour toutes les langues.
 	 *
 	 * @since 1.0.0
+	 * @since 1.4.0 Simplifié avec un seul bouton informatif.
 	 * @return array Traductions du popup par langue.
 	 */
 	private function get_popup_translations() {
@@ -156,22 +157,44 @@ class EAI_ML_Conversation_Handler {
 		 */
 		return apply_filters( 'eai_ml_popup_translations', array(
 			'fr' => array(
-				'title'         => 'Changement de langue détecté',
-				'message'       => 'Vous avez changé la langue. Pour continuer en français, veuillez démarrer une nouvelle discussion avec Reflexivo.',
-				'btnNewConv'    => 'Démarrer nouvelle discussion',
-				'btnFinishCurr' => 'Terminer la discussion actuelle',
+				'title'              => 'Changement de langue',
+				'message'            => 'Vous avez changé la langue en {newLang}. Vous avez une discussion en cours en {oldLang} avec {botName}. {botName} ne peut pas changer de langue en cours de discussion.<br><br>Pour démarrer une nouvelle conversation en {newLang}, cliquez sur le bouton <strong>"{clearBtn}"</strong>.',
+				'btnOk'              => 'Compris',
+				// Noms des langues
+				'langNames'          => array(
+					'fr' => 'français',
+					'en' => 'anglais',
+					'es' => 'espagnol',
+					'de' => 'allemand',
+					'it' => 'italien',
+					'pt' => 'portugais',
+				),
 			),
 			'en' => array(
-				'title'         => 'Language change detected',
-				'message'       => 'You changed the language. To continue in English, please start a new conversation with Reflexivo.',
-				'btnNewConv'    => 'Start new conversation now',
-				'btnFinishCurr' => 'Finish current one',
+				'title'              => 'Language Change',
+				'message'            => 'You changed the language to {newLang}. You have an ongoing conversation in {oldLang} with {botName}. {botName} cannot change language during a conversation.<br><br>To start a new conversation in {newLang}, click on the <strong>"{clearBtn}"</strong> button.',
+				'btnOk'              => 'Got it',
+				'langNames'          => array(
+					'fr' => 'French',
+					'en' => 'English',
+					'es' => 'Spanish',
+					'de' => 'German',
+					'it' => 'Italian',
+					'pt' => 'Portuguese',
+				),
 			),
 			'es' => array(
-				'title'         => 'Cambio de idioma detectado',
-				'message'       => 'Has cambiado el idioma. Para continuar en español, por favor inicia una nueva conversación con Reflexivo.',
-				'btnNewConv'    => 'Iniciar nueva conversación',
-				'btnFinishCurr' => 'Terminar la actual',
+				'title'              => 'Cambio de idioma',
+				'message'            => 'Has cambiado el idioma a {newLang}. Tienes una conversación en curso en {oldLang} con {botName}. {botName} no puede cambiar de idioma durante una conversación.<br><br>Para iniciar una nueva conversación en {newLang}, haz clic en el botón <strong>"{clearBtn}"</strong>.',
+				'btnOk'              => 'Entendido',
+				'langNames'          => array(
+					'fr' => 'francés',
+					'en' => 'inglés',
+					'es' => 'español',
+					'de' => 'alemán',
+					'it' => 'italiano',
+					'pt' => 'portugués',
+				),
 			),
 		) );
 	}

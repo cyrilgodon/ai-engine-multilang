@@ -53,3 +53,4 @@ Le header `Requires Plugins:` existe depuis WordPress 6.5 (2024) et rend obsolè
 
 **Migration depuis v1.0.0-1.0.2** : Aucune action requise, simple mise à jour. Le comportement est identique mais le code est beaucoup plus propre.
 
+
